@@ -12,8 +12,7 @@ $view = new Template();
 $view->templatePath = './template/';
 // 编译文件存放路径 最后以/结尾
 $view->compilePath = './compile/';
-// 模板文件
-$view->template = 'index';
+
 // 布局文件在末班目录下
 $view->layout = 'layout';
 // 渲染模板
