@@ -16,7 +16,7 @@ $view->compilePath = './compile/';
 $view->template = 'index';
 // 布局文件在末班目录下
 $view->layout = 'layout';
-
+// 渲染模板
 $view->render('index',[
     'title'=>'测试页',
     'content'=>'内容',
@@ -24,3 +24,5 @@ $view->render('index',[
         1,2,3
     ]
 ]);
+//清空缓存
+//$view->clean();

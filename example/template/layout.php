@@ -5,10 +5,10 @@
     <title><block title>默认标题</block></title>
 </head>
 <body>
-<block content>默认内容</block>
-<block footer>默认内容</block>
+<block content>我是布局模板content</block>
+<block footer>我是布局模板footer</block>
 <div>
-    布局载入
+    我是布局文件，我载入了footer
     <include footer></include>
 </div>
 

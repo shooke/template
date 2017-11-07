@@ -19,6 +19,8 @@ class Template
     // 变量
     public $variable;
 
+    private $lockFile = 'lastupdatetime';
+
 
     /**
      * 只渲染模板，主要用于include 标签
@@ -32,7 +34,7 @@ class Template
         if( !file_exists($compileFile) || filemtime($compileFile) <= filemtime($templateFile) ){
             $compileContent = $this->tagParse(file_get_contents($templateFile));
             // 保存编译结果
-            file_put_contents($compileFile,$compileContent);
+            $this->save($compileFile,$compileContent);
         }
         if(is_array($this->variable)){
             extract($this->variable, EXTR_OVERWRITE);
@@ -59,6 +61,45 @@ class Template
         include $compileFile;
     }
 
+    /**
+     * 清除编译缓存
+     */
+    public function clean()
+    {
+        $dh = opendir($this->compilePath);
+        while ($file = readdir($dh)) {
+            if ($file != "." && $file != "..") {
+                $fullPath = $this->compilePath . "/" . $file;
+                if (!is_dir($fullPath)) {
+                    unlink($fullPath);
+                } else {
+                    $this->clean($fullPath);
+                }
+            }
+        }
+        closedir($dh);
+    }
+    /**
+     * 保存换成文件
+     * @param $file
+     * @param $content
+     */
+    public function save($file,$content)
+    {
+        // 保存文件
+        file_put_contents($file,$content);
+        // 记录最后更新时间
+        file_put_contents($this->lastUpdateFile(),time());
+    }
+
+    /**
+     * 最后更新时间
+     * @return string
+     */
+    private function lastUpdateFile()
+    {
+        return $this->compilePath.$this->lockFile;
+    }
     /**
      * 编译模板
      */
@@ -108,7 +149,7 @@ class Template
         }
 
         // 保存编译结果
-        file_put_contents($this->getCompileFile(),$compileContent);
+        $this->save($this->getCompileFile(),$compileContent);
     }
 
 
@@ -177,9 +218,11 @@ class Template
          * <else> 或 <else/> => <?php } else { ?>
          * </if> => <?php } ?>
          */
+        $template = preg_replace('/' . $left . 'if\s+(\(.+?\))' . $right . '/', '<?php if \\1 { ?>', $template);
         $template = preg_replace('/' . $left . 'if\s+(.+?)' . $right . '/', '<?php if(\\1) { ?>', $template);
         $template = preg_replace('/' . $left . 'else' . $right . '/', '<?php } else { ?>', $template);
         $template = preg_replace('/' . $left . 'else\/' . $right . '/', '<?php } else { ?>', $template);
+        $template = preg_replace('/' . $left . '(elseif|else\s+if)\s+(\(.+?\))' . $right . '/', '<?php } elseif \\2 { ?>', $template);
         $template = preg_replace('/' . $left . '(elseif|else\s+if)\s+(.+?)' . $right . '/', '<?php } elseif (\\2) { ?>', $template);
         $template = preg_replace('/' . $left . '\/if' . $right . '/', '<?php } ?>', $template);
 
@@ -193,8 +236,13 @@ class Template
          */
         $template = preg_replace('/' . $left . 'for\s+\(\s*(.+?)\s*,\s*(.+?)\s*\)\s+in\s+(.+?)' . $right . '/', '<?php foreach(\\3 as \\2 => \\1) { ?>', $template);
         $template = preg_replace('/' . $left . 'for\s+(.+?)\s+in\s+(.+?)' . $right . '/', '<?php foreach(\\2 as \\1) { ?>', $template);
+        $template = preg_replace('/' . $left . 'for\s+(\(.+?\))' . $right . '/', '<?php for\\1 { ?>', $template);
         $template = preg_replace('/' . $left . 'for\s+(.+?)' . $right . '/', '<?php for(\\1) { ?>', $template);
         $template = preg_replace('/' . $left . '\/for' . $right . '/', '<?php } ?>', $template);
+
+        // foreach
+        $template = preg_replace('/' . $left . 'foreach\s+(\(.+?\))' . $right . '/', '<?php foreach \\1 { ?>', $template);
+        $template = preg_replace('/' . $left . '\/foreach' . $right . '/', '<?php } ?>', $template);
 
         // 常量 函数 变量
         /**
