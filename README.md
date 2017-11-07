@@ -17,7 +17,7 @@
 
     {{ date('Y-m-d') }}
 
-    __APP__ 两边下划线的常量直接使用，会翻译为&lt;?php if(defined('__APP__')){echo __APP__;}else{echo '__APP__';} ?$gt;
+    __APP__ 两边下划线的常量直接使用，会翻译为< ?php if(defined('__APP__')){echo __APP__;}else{echo '__APP__';} ?>
 
     {{ CONST_VAR }} 普通常量跟变量用法一致，需要用{{}}括起来
 ```
