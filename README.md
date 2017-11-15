@@ -27,10 +27,10 @@
 ```
         if判断
         <if （$var>1）>
-            $var&gt1
+            $var>1
         <elseif ($var==1)>
            $var=1
-        <else/&gt
+        <else/>
             $var<1
         </if>
 
@@ -47,7 +47,7 @@
         相当于foreach($array as $item)
 
         <for ($item,$index) in $array>
-            {{ $index }}=&gt{{ $item['title'] }}
+            {{ $index }}=>{{ $item['title'] }}
         </for>
         相当于foreach($array as $index=>$item)
 
@@ -56,7 +56,7 @@
             {{ $item['title'] }}
         </foreach>
         <foreach ($array as $index=>$item)>
-            {{ $index }}=&gt{{ $item['title'] }}
+            {{ $index }}=>{{ $item['title'] }}
         </foreach>
 ```
 
